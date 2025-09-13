@@ -1,4 +1,4 @@
-% Kaung Khant Lin ID: 6540131
+% Kaung Khant Lin ID: 6540131 542
 
 edge(a, b).
 edge(b, c).

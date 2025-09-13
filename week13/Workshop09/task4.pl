@@ -1,4 +1,5 @@
-% Kaung Khant Lin, ID: 6540131
+% Kaung Khant Lin ID: 6540131 542
+
 /* task4.pl
 
     People:      chayapol, paitoon, thanachai

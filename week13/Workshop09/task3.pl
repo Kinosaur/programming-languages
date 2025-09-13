@@ -1,6 +1,7 @@
-% Kaung Khant Lin, ID: 6540131
+% Kaung Khant Lin ID: 6540131 542
+
 /* expanded_adventure.pl
-    Expanded Adventure Game (map-accurate + available-moves shown)
+    Expanded Adventure Game (map-accurate + available-moves shown, randomized entities)
 
     Map summary (locations only):
     valley -> forest
@@ -17,14 +18,16 @@
     swamp -> forward: hermithut -> forward: fork
     fork -> left: trap (death), right: mountaintop (treasure)
 
-    Entities (placed at startup):
-    - ogre at maze(3)
-    - treasure at mountaintop
+    Entities (randomized at startup):
+    - ogre: placed randomly in one of the maze nodes
+    - treasure: always at mountaintop (not randomized)
 
-    Legal commands: forward.  left.  right.  look.
-  */
+    Legal commands: forward. left. right. look.
+*/
 
 :- dynamic at/2.   % at(Entity,Location)
+
+:- use_module(library(random)).
 
 % Descriptions
 
@@ -45,7 +48,8 @@ description(fork, 'You are at a fork in the path. Danger one way, treasure the o
 description(trap, 'A hidden trap snaps shut!').
 description(mountaintop, 'You are on the mountaintop. A treasure glitters here.').
 
-% Helper: available moves + printing
+
+% Helper: available moves
 
 available_moves(Loc, Dirs) :-
     findall(Dir, connect(Loc, Dir, _), Dirs).
@@ -56,7 +60,6 @@ print_moves([D1,D2|Rest]) :-
     write(D1), write(', '),
     print_moves([D2|Rest]).
 
-% Report location + available moves (called on arrival and on illegal move)
 report :-
     at(you, Loc),
     description(Loc, Text),
@@ -69,12 +72,9 @@ report :-
         print_moves(Dirs)
     ).
 
-% A simple 'look' command to reprint current location & available moves
 look :- report.
 
-
-% Map connections (locations only)
-% connect(Current,Direction,Next)
+% Map connections
 
 connect(valley, forward, forest).
 
@@ -96,14 +96,13 @@ connect(cave, forward, maze(0)).
 connect(mountaintrail, forward, snowfield).
 connect(snowfield, forward, fork).
 
-% Maze system (loops)
 connect(maze(0), left, maze(1)).
 connect(maze(0), right, maze(2)).
 
 connect(maze(1), left, maze(3)).
 connect(maze(1), right, fork).
 
-connect(maze(2), right, maze(0)).   % loop back
+connect(maze(2), right, maze(0)).
 connect(maze(2), left, swamp).
 
 connect(maze(3), left, maze(0)).
@@ -115,109 +114,99 @@ connect(hermithut, forward, fork).
 connect(fork, left, trap).
 connect(fork, right, mountaintop).
 
-
-% Movement: perform move only if connect/3 exists
+% Movement rules
 
 move(Dir) :-
     at(you, Loc),
-    connect(Loc, Dir, Next),   % only succeed if this direction exists
+    connect(Loc, Dir, Next),
     retract(at(you, Loc)),
     assert(at(you, Next)),
     report,
     !.
 move(_) :-
-    % illegal move: show current location and allowed moves (no guessing)
     report,
     write('That is not a legal move. Choose one of the "Available moves."'), nl.
 
-% Shorthand directions
 forward :- move(forward).
 left    :- move(left).
 right   :- move(right).
 
-% Hazards and win condition
-% All set at(you,done) on game end
+% Hazards and Win condition
 
 gameover :-
     at(you, Loc),
     retract(at(you, Loc)),
     assert(at(you, done)).
 
-% Ogre kills if you are at same location as the ogre entity
 ogre :-
     at(ogre, Loc),
     at(you, Loc),
     write('An ogre ambushes you and you die!'), nl,
-    gameover,
-    !.
+    gameover, !.
 ogre.
 
-% Trap location (lose)
 trap :-
     at(you, trap),
     write('You are trapped and cannot escape! Game over.'), nl,
-    gameover,
-    !.
+    gameover, !.
 trap.
 
-% Cliff: falling death
 cliff :-
     at(you, cliff),
     write('You slip and fall off the cliff. You die.'), nl,
-    gameover,
-    !.
+    gameover, !.
 cliff.
 
-% Swamp: instant sink (death)
 swamp :-
     at(you, swamp),
     write('You sink into the swamp. You perish.'), nl,
-    gameover,
-    !.
+    gameover, !.
 swamp.
 
-% Snowfield: blizzard death
 snowfield :-
     at(you, snowfield),
     write('A sudden blizzard overwhelms you. You freeze.'), nl,
-    gameover,
-    !.
+    gameover, !.
 snowfield.
 
-% Treasure: winning condition (treasure entity placed at mountaintop)
 treasure :-
     at(treasure, Loc),
     at(you, Loc),
     write('There is a treasure here!'), nl,
     write('Congratulations — you win!'), nl,
-    gameover,
-    !.
+    gameover, !.
 treasure.
 
 % Main loop
 
 main :-
     at(you, done),
-    write('Thanks for playing.'), nl,
-    !.
+    write('Thanks for playing.'), nl, !.
 
 main :-
     write('\nNext move -- '),
     read(Move),
-    call(Move),             % move/command (or illegal)
+    call(Move),
     ogre, trap, cliff, swamp, snowfield, treasure,
     main.
 
-% Game startup
+% Randomized entity placement
+
+randomize_entities :-
+    % Ogre can be placed randomly at maze(0..3)
+    random_between(0,3,N),
+    assert(at(ogre, maze(N))),
+    % Treasure is always at mountaintop
+    assert(at(treasure, mountaintop)).
+
+% Startup
 
 go :-
-    retractall(at(_,_)),               % clear previous state
-    assert(at(you, valley)),           % player start
-    assert(at(ogre, maze(3))),         % place ogre as entity (not a map node)
-    assert(at(treasure, mountaintop)),% place treasure
+    retractall(at(_,_)),
+    assert(at(you, valley)),
+    randomize_entities,
     write('Welcome to the expanded adventure game.'), nl,
     write('Legal moves: forward, left, right. Use look. to re-check location.'), nl,
     write('End each command with a period.'), nl, nl,
     report,
     main.
-% -------------------------

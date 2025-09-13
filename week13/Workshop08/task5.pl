@@ -1,3 +1,5 @@
+% Kaung Khant Lin ID: 6540131 542
+
 % main predicate that builds valid arrangements based on the clues
 solution(Street) :-
     Street = [house(C1, D1, P1), house(C2, D2, P2), house(C3, D3, P3)],

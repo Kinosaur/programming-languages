@@ -1,4 +1,6 @@
-% Course prerequisite facts
+% Kaung Khant Lin ID: 6540131 542
+
+% Course prerequisite facts got from 65X curriculum
 prereq(csx3002, csx3001).
 prereq(csx3003, csx3002).
 prereq(csx3004, csx3002).
