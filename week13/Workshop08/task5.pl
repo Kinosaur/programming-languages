@@ -14,7 +14,7 @@ solution(Street) :-
     permutation(Drinks, [D1, D2, D3]),
     permutation(Pets,   [P1, P2, P3]),
 
-    % Clues (translated):
+    % Clues:
     % 1) Red is immediately left of Green -> red is at position i and green at i+1
     adjacent_left(house(red, _, _), house(green, _, _), Street),
 
