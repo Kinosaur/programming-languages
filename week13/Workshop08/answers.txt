@@ -1,0 +1,63 @@
+Short answer
+
+The current file is fine for a university-level assignment: it's simple, well-commented, and uses straightforward Prolog tools (lists, permutation, member, nth1). It’s appropriate for a small 3-house logic puzzle. Below are step-by-step talking points you can use when the lecturer asks, likely questions + good answers, quick tests you can run, and suggested improvements you can mention.
+How to explain the code (step‑by‑step, as if speaking to the lecturer)
+
+Representation
+"I represent the street as a list of three terms: [house(Color, Drink, Pet), ...]. The first list element is the left house (position 1), the second is middle (2), and third is right (3). This keeps position and properties together and makes indexing easy with nth1/3."
+Building candidate arrangements
+"I use permutation/2 to assign the three colors, the three drink options, and the three pets. For N=3 this is simple and transparent: permutation enumerates all possible assignments without me writing low-level loops."
+Encoding the clues
+"Each natural-language clue maps to a Prolog condition:
+'Red immediately left of Green' -> adjacent_left(house(red,,), house(green,,), Street).
+'Red owns a cat' -> member(house(red,_,cat), Street).
+'Middle drinks tea' -> nth1(2, Street, house(,tea,)).
+'Green drinks coffee' -> member(house(green,coffee,_), Street)."
+Solving and extracting answers
+"solution(Street) is true for every Street consistent with clues. cat_owner/0 and coffee_drinker/0 call solution/1, then use nth1/3 to find the position index and map it to human-friendly names (left/middle/right), printing the result."
+Why nth1/3
+"nth1(Index, List, Elem) is a built-in helper that fetches the Index-th element using 1-based indexing. I used nth1 so position numbers naturally match left=1, middle=2, right=3."
+Correctness reasoning
+"Because I enumerate all combinations and then filter by the clues, any Street returned by solution/1 satisfies all clues. For this puzzle size, the brute-force + constraint filtering is fully acceptable and easy to verify."
+Likely lecturer questions and concise answers
+
+Q: Why use permutation instead of a constraint solver (CLP(FD))?
+A: For a 3-item puzzle permutation is simple and clear. If the lecturer prefers constraint programming, we can rewrite using CLP(FD) to scale better and be more declarative.
+Q: Is the solution deterministic? Is there exactly one solution?
+A: For the given clues the program will enumerate all solutions; typically there is one. You can ask solution(Street). in SWI-Prolog and press ; to see if there are alternate solutions. If multiple solutions exist, the program will enumerate them.
+Q: Complexity / Efficiency?
+A: With 3 items we try permutations of colors, drinks, and pets => 3! * 3! * 3! = 6 * 6 * 6 = 216 candidate assignments. Each candidate is then filtered by cheap checks. For this assignment size that's trivial; for larger N you'd prefer constraint propagation (CLP(FD)).
+Q: How do you ensure positions are consistent (e.g., red not placed in two houses)?
+A: permutation ensures no duplicate colors or drinks or pets in the list because it builds each property list from an explicit permutation of the distinct items array.
+Q: What happens if clues contradict each other?
+A: solution/1 will simply fail (no solutions). You can detect that programmatically and report "no solution".
+Quick tests to run (copy these commands)
+
+To print both answers:
+swipl -q -s task5.pl -g "cat_owner, coffee_drinker, halt."
+To inspect the full street/solution(s):
+Start SWI-Prolog and run:
+?- solution(S), write(S), nl, fail. % prints all solutions
+or ?- solution(S). % show one solution, press ; to see more
+Expected printed lines (example):
+Cat owner: red house (left).
+Coffee drinker: green house (right). (Run above to confirm exact output on your machine.)
+Small script of useful queries inside swipl interactive:
+
+?- solution(S).
+?- cat_owner(Color, Pos).
+?- coffee_drinker(Color, Pos).
+Edge cases and integrity checks to mention
+
+If you change the property lists (Colors/Drinks/Pets), ensure all lists have the same length and contain distinct values.
+If you accidentally remove a clue, more solutions may appear — show this to the lecturer to explain how constraints reduce the solution space.
+If the professor expects more robust error handling, add an explicit check that permutation succeeded (though permutation will fail cleanly if lists mismatch).
+Possible improvements to propose (good to mention)
+
+Add automated tests with PlUnit that assert expected Color and Pos for cat_owner/2 and coffee_drinker/2.
+Replace permutation approach with CLP(FD) for a more declarative and scalable solver (good if the lecturer likes constraints).
+Add a predicate that prints the entire Street layout in a friendly table for demonstration.
+Add a "no solution" message if solution/1 fails.
+One-line summary you can say in class
+
+"I modelled each house as house(Color, Drink, Pet), generated assignments with permutation/2, and applied the clues as simple list constraints; for N=3 this is clear, correct, and easy to test, and I can refactor to CLP(FD) if efficiency or scaling is required."
