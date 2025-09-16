@@ -68,7 +68,7 @@ fromUndirectedEdges es =
 
 -- Turn an adjacency map into a successor function.
 adjacencyOf :: (Ord a) => Map a [a] -> (a -> [a])
-adjacencyOf m = \x -> Map.findWithDefault [] x m
+adjacencyOf m x = Map.findWithDefault [] x m
 
 -- Example graphs
 -- Directed: includes a cycle 3 -> 1 to show "skip (seen)" lines.
