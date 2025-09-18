@@ -11,3 +11,11 @@
 
 - swipl -q -s miniProject2/prolog/bfs.pl -- miniProject2/data/undirected/u1_simple.txt undirected
 - swipl -q -s miniProject2/prolog/dfs.pl -- miniProject2/data/undirected/u1_simple.txt undirected
+
+# BFS_NUM (directed)
+- swipl -q -s miniProject2/prolog/bfs_num.pl -- miniProject2/data/directed/d1_simple.in directed
+- swipl -q -s miniProject2/prolog/dfs_num.pl -- miniProject2/data/directed/d1_simple.in directed
+
+# DFS_NUM (undirected)
+- swipl -q -s miniProject2/prolog/bfs_num.pl -- miniProject2/data/undirected/u1_simple.in undirected
+- swipl -q -s miniProject2/prolog/dfs_num.pl -- miniProject2/data/undirected/u1_simple.in undirected
