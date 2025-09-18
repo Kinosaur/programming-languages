@@ -1,19 +1,18 @@
-# Changelog for `dfs`
+# Changelog
 
-All notable changes to this project will be documented in this file.
+## [Unreleased]
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to the
-[Haskell Package Versioning Policy](https://pvp.haskell.org/).
-
-## Unreleased
 ### Added
-- CLI now supports `--mode` flag for specifying directed or undirected mode explicitly.
-- Updated usage instructions in `Main.hs`.
-- Improved argument parsing to handle `--mode=<val>` and `-m <val>` formats.
+- Implemented DFS (Depth-First Search) for directed and undirected graphs.
+- Added `Graph.Format` module to parse input files in `N M + SRC DST + M edges` format.
+- Added `Graph.Directed` and `Graph.Undirected` modules to handle adjacency list construction.
+- Added `Graph.DFS` module for DFS path search with deduped and sorted neighbors.
+- Command-line interface in `Main.hs` to specify graph mode (`--mode directed` or `--mode undirected`) and input file.
 
 ### Changed
-- Refactored `Main.hs` to use explicit mode flags instead of path inference.
+- Updated `stack.yaml` to include `ghc-options` for linker warnings.
+- Updated `dfs.cabal` to include all modules and ensure compatibility.
 
-## 0.1.0.0
-- Initial undirected DFS with sorted neighbors, simple trace, and file parsing.
+### Testing
+- Test cases for both directed and undirected graphs are included in the `data/` directory.
+- Verified output matches expected results for all test cases.

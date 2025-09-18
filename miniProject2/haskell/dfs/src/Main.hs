@@ -64,13 +64,13 @@ runDirected (NMInput _ _ srcNode dstNode edgeList) =
   let adj = Dir.buildAdjacency edgeList
       succF = Dir.succOf adj
   in case dfsPath succF srcNode dstNode of
-       Nothing -> putStrLn "No path"
-       Just path -> putStrLn (unwords (map show path))
+        Nothing -> putStrLn "No path"
+        Just path -> putStrLn (unwords (map show path))
 
 runUndirected :: NMInput -> IO ()
 runUndirected (NMInput _ _ srcNode dstNode edgeList) =
   let adj = Undir.buildAdjacency edgeList
       succF = Undir.succOf adj
   in case dfsPath succF srcNode dstNode of
-       Nothing -> putStrLn "No path"
-       Just path -> putStrLn (unwords (map show path))
+        Nothing -> putStrLn "No path"
+        Just path -> putStrLn (unwords (map show path))
