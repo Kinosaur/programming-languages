@@ -46,12 +46,12 @@ getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: 
 
 
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
-bindir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/bin"
-libdir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0-71TxvwNupAR6mTd0Xi6qja-dfs"
-dynlibdir  = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed"
-datadir    = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/share/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0"
-libexecdir = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/libexec/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0"
-sysconfdir = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/etc"
+bindir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/bin"
+libdir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0-71TxvwNupAR6mTd0Xi6qja-dfs"
+dynlibdir  = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed"
+datadir    = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/share/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0"
+libexecdir = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/libexec/aarch64-osx-ghc-9.10.2-b8ed/dfs-0.1.0.0"
+sysconfdir = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/dfs/.stack-work/install/aarch64-osx/8a23e66c55caae3ab758dd343a583c212e55e74d6c7a6f473b5b8b200aa41620/9.10.2/etc"
 
 getBinDir     = catchIO (getEnv "dfs_bindir")     (\_ -> return bindir)
 getLibDir     = catchIO (getEnv "dfs_libdir")     (\_ -> return libdir)

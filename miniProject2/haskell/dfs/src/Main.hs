@@ -2,52 +2,75 @@
 module Main (main) where
 
 import System.Environment (getArgs)
-import Data.List (intercalate)
+import System.Exit (exitFailure)
+import Data.Char (toLower)
+import Data.List (isPrefixOf)
 
-import Graph.DFS (dfs, dfsTrace)
-import Graph.Directed
-  ( readDirectedFile
-  , buildAdjacency
-  , succOf
-  , nodesOf
-  , directedEdgeCount
-  )
+import Graph.Format (NMInput(..), readNMInput)
+import qualified Graph.Directed as Dir
+import qualified Graph.Undirected as Undir
+import Graph.DFS (dfsPath)
+
+data Mode = Directed | Undirected deriving (Eq, Show)
 
 usage :: IO ()
 usage = do
-  putStrLn "Usage: stack run -- <edge-file> [start-node]"
-  putStrLn "  <edge-file>: path like data/undirected/u1_simple.txt"
-  putStrLn "  [start-node]: optional; default 'S' if present, else smallest node"
+  putStrLn "Usage:"
+  putStrLn "  stack run -- --mode directed <path/to/input.in>"
+  putStrLn "  stack run -- --mode undirected <path/to/input.in>"
+  putStrLn ""
+  putStrLn "Input format: N M, then SRC DST, then M lines of edges U V (integers)."
+  putStrLn "Output: space-separated path from SRC to DST, or 'No path'."
 
-pickStart :: [String] -> String
-pickStart ns =
-  case (elem "S" ns, ns) of
-    (True, _)   -> "S"
-    (_, x:_)    -> x
-    _           -> error "No nodes found in graph."
+parseMode :: String -> Maybe Mode
+parseMode s =
+  case map toLower s of
+    "directed" -> Just Directed
+    "undirected" -> Just Undirected
+    _ -> Nothing
+
+-- Accepts:
+--   --mode <val> <file>
+--   -m <val> <file>
+--   --mode=<val> <file>
+parseArgs :: [String] -> Either String (Mode, FilePath)
+parseArgs ["--mode", modeStr, filePath] = maybe (Left "Error: invalid arguments.") (\parsedMode -> Right (parsedMode, filePath)) (parseMode modeStr)
+parseArgs ["-m", modeStr, filePath] = maybe (Left "Error: invalid arguments.") (\parsedMode -> Right (parsedMode, filePath)) (parseMode modeStr)
+parseArgs [opt, filePath]
+  | "--mode=" `isPrefixOf` opt =
+      let modeStr = drop (length "--mode=") opt
+      in maybe (Left "Error: invalid arguments.") (\parsedMode -> Right (parsedMode, filePath)) (parseMode modeStr)
+parseArgs _ = Left "Error: invalid arguments."
 
 main :: IO ()
 main = do
-  args <- getArgs
-  case args of
-    [fp]      -> run fp Nothing
-    [fp,s]    -> run fp (Just s)
-    _         -> usage
-  where
-    run fp mStart = do
-      es <- readDirectedFile fp
-      let adj      = buildAdjacency es
-          succF    = succOf adj
-          ns       = nodesOf adj
-          ecount   = directedEdgeCount es
-          start    = maybe (pickStart ns) id mStart
-      putStrLn $ "Loaded directed graph from: " <> fp
-      putStrLn $ "Nodes (" <> show (length ns) <> "): " <> intercalate " " ns
-      putStrLn $ "Unique directed edges: " <> show ecount
-      putStrLn $ "Start node: " <> show start
-      putStrLn ""
+  e <- parseArgs <$> getArgs
+  case e of
+    Left err -> do
+      putStrLn err
+      usage
+      exitFailure
+    Right (mode, filePath) -> run mode filePath
 
-      let order = dfs succF start
-      putStrLn $ "DFS visit order (smallest neighbor first): " <> show order
-      putStrLn "Steps:"
-      mapM_ putStrLn (zipWith (\i s -> show i <> ". " <> s) [(1::Int)..] (dfsTrace succF start))
+run :: Mode -> FilePath -> IO ()
+run mode filePath = do
+  nmInput <- readNMInput filePath
+  case mode of
+    Directed -> runDirected nmInput
+    Undirected -> runUndirected nmInput
+
+runDirected :: NMInput -> IO ()
+runDirected (NMInput _ _ srcNode dstNode edgeList) =
+  let adj = Dir.buildAdjacency edgeList
+      succF = Dir.succOf adj
+  in case dfsPath succF srcNode dstNode of
+       Nothing -> putStrLn "No path"
+       Just path -> putStrLn (unwords (map show path))
+
+runUndirected :: NMInput -> IO ()
+runUndirected (NMInput _ _ srcNode dstNode edgeList) =
+  let adj = Undir.buildAdjacency edgeList
+      succF = Undir.succOf adj
+  in case dfsPath succF srcNode dstNode of
+       Nothing -> putStrLn "No path"
+       Just path -> putStrLn (unwords (map show path))
