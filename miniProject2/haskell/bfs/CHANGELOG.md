@@ -8,4 +8,9 @@ and this project adheres to the
 
 ## Unreleased
 
+- Implemented BFS algorithm for both directed and undirected graphs
+- Added input/output formatting for graph data
+- Added test cases for various graph scenarios (simple, cycles, no path, tie shortest, long vs short bias, self loop)
+- Initial project structure and setup
+
 ## 0.1.0.0 - YYYY-MM-DD

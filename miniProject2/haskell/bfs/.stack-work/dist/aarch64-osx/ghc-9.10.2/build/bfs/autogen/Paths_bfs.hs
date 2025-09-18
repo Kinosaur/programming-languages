@@ -47,7 +47,7 @@ getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: 
 
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 bindir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/bin"
-libdir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed/bfs-0.1.0.0-BxM858pBPLl9IODDKvPL0l-bfs"
+libdir     = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed/bfs-0.1.0.0-4zP2cZYSXUH41qHMZRMDLh-bfs"
 dynlibdir  = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/lib/aarch64-osx-ghc-9.10.2-b8ed"
 datadir    = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/share/aarch64-osx-ghc-9.10.2-b8ed/bfs-0.1.0.0"
 libexecdir = "/Users/kaungkhantlin/Developer/1_2025/programming-languages/miniProject2/haskell/bfs/.stack-work/install/aarch64-osx/c78f44e280091ae3ad87365000415eeba04bd5428fcc403b489b919ce70727d6/9.10.2/libexec/aarch64-osx-ghc-9.10.2-b8ed/bfs-0.1.0.0"

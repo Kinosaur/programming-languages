@@ -20,6 +20,6 @@ version = Version [0,1,0,0] []
 synopsis :: String
 synopsis = ""
 copyright :: String
-copyright = "2025 Author name here"
+copyright = ""
 homepage :: String
 homepage = "https://github.com/githubuser/bfs#readme"
