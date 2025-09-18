@@ -1,16 +1,16 @@
 {-# OPTIONS_GHC -Wall #-}
 module Main (main) where
 
-import           System.Environment (getArgs)
-import           Data.List (intercalate)
+import System.Environment (getArgs)
+import Data.List (intercalate)
 
-import           Graph.DFS (dfs, dfsTrace)
-import           Graph.Undirected
-  ( readUndirectedFile
+import Graph.DFS (dfs, dfsTrace)
+import Graph.Directed
+  ( readDirectedFile
   , buildAdjacency
   , succOf
   , nodesOf
-  , undirectedEdgeCount
+  , directedEdgeCount
   )
 
 usage :: IO ()
@@ -35,15 +35,15 @@ main = do
     _         -> usage
   where
     run fp mStart = do
-      es <- readUndirectedFile fp
+      es <- readDirectedFile fp
       let adj      = buildAdjacency es
           succF    = succOf adj
           ns       = nodesOf adj
-          ecount   = undirectedEdgeCount es
+          ecount   = directedEdgeCount es
           start    = maybe (pickStart ns) id mStart
-      putStrLn $ "Loaded undirected graph from: " <> fp
+      putStrLn $ "Loaded directed graph from: " <> fp
       putStrLn $ "Nodes (" <> show (length ns) <> "): " <> intercalate " " ns
-      putStrLn $ "Unique undirected edges: " <> show ecount
+      putStrLn $ "Unique directed edges: " <> show ecount
       putStrLn $ "Start node: " <> show start
       putStrLn ""
 

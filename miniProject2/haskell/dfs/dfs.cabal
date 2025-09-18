@@ -30,8 +30,9 @@ executable dfs
                        -Wpartial-fields
                        -Wredundant-constraints
   other-modules:
-      Graph.DFS
-      Graph.Undirected
+    Graph.DFS
+    Graph.Undirected
+    Graph.Directed
 
 source-repository head
   type:     git
