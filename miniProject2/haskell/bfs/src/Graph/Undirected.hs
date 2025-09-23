@@ -18,7 +18,7 @@ buildAdjacency es =
         let m1 = IM.insertWith IS.union u (IS.singleton v) m
             m2 = IM.insertWith IS.union v (IS.singleton u) m1
         in m2
-      msets = foldl step IM.empty es :: IM.IntMap IS.IntSet
+      msets = foldl' step IM.empty es :: IM.IntMap IS.IntSet
   in IM.map IS.toList msets
 
 succOf :: Adj -> (Int -> [Int])

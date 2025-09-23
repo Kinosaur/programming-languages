@@ -15,7 +15,7 @@ type Adj = IM.IntMap [Int]
 buildAdjacency :: [(Int, Int)] -> Adj
 buildAdjacency es =
   let step m (u,v) = IM.insertWith IS.union u (IS.singleton v) m
-      msets = foldl step IM.empty es :: IM.IntMap IS.IntSet
+      msets = foldl' step IM.empty es :: IM.IntMap IS.IntSet
   in IM.map IS.toList msets
 
 succOf :: Adj -> (Int -> [Int])
