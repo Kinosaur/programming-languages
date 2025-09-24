@@ -29,9 +29,9 @@ executable bfs
       -Wpartial-fields
       -Wredundant-constraints
   other-modules:
-      Graph.Format
-      Graph.Directed
-      Graph.Undirected
       Graph.BFS
+      Graph.Format
+      Graph.DirectedBFS
+      Graph.UndirectedBFS
   if os(darwin)
     ghc-options: -optl -w

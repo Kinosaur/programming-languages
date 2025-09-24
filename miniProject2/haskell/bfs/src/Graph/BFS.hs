@@ -8,9 +8,9 @@ module Graph.BFS
   ) where
 
 import qualified Data.IntMap.Strict as IM
-import qualified Data.IntSet        as IS
-import qualified Data.Sequence      as Seq
-import           Data.Sequence (Seq, ViewL(..), (|>))
+import qualified Data.IntSet as IS
+import qualified Data.Sequence as Seq
+import Data.Sequence (Seq, ViewL(..), (|>))
 
 -- Returns the shortest path (by edges) from s to t under the given neighbor order,
 -- or Nothing if no path exists.

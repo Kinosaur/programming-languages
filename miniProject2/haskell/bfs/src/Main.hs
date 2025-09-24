@@ -1,15 +1,15 @@
 {-# OPTIONS_GHC -Wall #-}
 module Main (main) where
 
-import           System.Environment (getArgs)
-import           System.Exit        (exitFailure)
-import           Data.Char          (toLower)
-import           Data.List          (isPrefixOf)
+import System.Environment (getArgs)
+import System.Exit (exitFailure)
+import Data.Char (toLower)
+import Data.List (isPrefixOf)
 
-import           Graph.Format     (NMInput(..), readNMInput)
-import qualified Graph.Directed   as Dir
-import qualified Graph.Undirected as Undir
-import           Graph.BFS        (bfsPath)
+import Graph.Format (NMInput(..), readNMInput)
+import qualified Graph.DirectedBFS   as Dir
+import qualified Graph.UndirectedBFS as Undir
+import Graph.BFS (bfsPath)
 
 data Mode = Directed | Undirected deriving (Eq, Show)
 
