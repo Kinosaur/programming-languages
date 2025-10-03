@@ -1,3 +1,0 @@
--- CHAR Module
-
--- continue Tomorrow !!
