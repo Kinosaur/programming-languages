@@ -3,50 +3,76 @@
 :- initialization(main, main).
 
 % Run:
-% swipl -q -s miniProject2/prolog/dfs_num.pl -- <input_file> <directed|undirected>
+%   swipl -q -s miniProject2/prolog/dfs_num.pl -- <input_file> <directed|undirected>
+%
+% Supports numeric or atom node labels.
 
 main :-
     current_prolog_flag(argv, [File, KindStr]),
     ( KindStr = directed ; KindStr = undirected ), !,
     ( run(File, KindStr) -> true ; true ),
     halt(0).
-main :- format(user_error, "Usage: swipl -q -s dfs_num.pl -- <input_file> <directed|undirected>~n", []), halt(1).
+main :-
+    format(user_error, "Usage: swipl -q -s dfs_num.pl -- <input_file> <directed|undirected>~n", []),
+    halt(1).
 
 run(File, Kind) :-
     read_file_to_string(File, Content, []),
     split_string(Content, "\n", "\r\t ", LinesRaw),
     exclude(=(""), LinesRaw, Lines),
     ( Lines = [NMLine, SrcDstLine | Rest] -> true
-    ; writeln('No path'), !, fail
+    ; fail_no_path(parse_structure)
     ),
-    parse_nm(NMLine, N, M),
-    parse_pair_nums(SrcDstLine, Src, Dst),
+    parse_nm(NMLine, _DeclaredN, M),
+    parse_pair_generic(SrcDstLine, Src, Dst),
+
     exclude(=(""), Rest, EdgeLinesAll),
     length(EdgeLinesAll, LAll),
-    ( LAll < M -> writeln('No path'), !, fail ; true ),
+    ( LAll < M -> fail_no_path(too_few_edges) ; true ),
     length(EdgeLines, M),
     append(EdgeLines, _, EdgeLinesAll),
-    maplist(parse_edge_pair, EdgeLines, Edges0),
-    normalize_edges(Edges0, Kind, Edges),
-    build_adjacency(N, Edges, Adj0),
+    maplist(parse_edge_pair_generic, EdgeLines, EdgePairs0),
+    normalize_edges(EdgePairs0, Kind, Edges),
+
+    collect_all_nodes(Edges, Src, Dst, NodeSet),
+    ( member(Src, NodeSet), member(Dst, NodeSet)
+      -> true
+      ;  fail_no_path(src_or_dst_missing)
+    ),
+
+    build_adjacency(NodeSet, Edges, Adj0),
     sort_neighbors(Adj0, Adj),
+
     ( dfs(Adj, Src, Dst, Path) ->
-        atomic_list_concat(Path, ' ', Line), writeln(Line)
-    ; writeln('No path')
+        atomic_list_concat(Path, ' ', Line),
+        writeln(Line)
+    ; fail_no_path(no_search_path)
     ).
 
-% parsing (same helpers as BFS)
+fail_no_path(_Reason) :-
+    writeln('No path'), !, fail.
+
+% ---------- parsing ----------
 parse_nm(Line, N, M) :-
     split_string(Line, " ", " ", Parts0),
     exclude(=(""), Parts0, [NS, MS]),
-    number_string(N, NS), number_string(M, MS).
+    number_string(N, NS),
+    number_string(M, MS).
 
-parse_pair_nums(Line, A, B) :-
+parse_pair_generic(Line, A, B) :-
     split_string(Line, " ", " ", Parts0),
     exclude(=(""), Parts0, [AS, BS]),
-    number_string(A, AS), number_string(B, BS).
+    parse_node(AS, A),
+    parse_node(BS, B).
 
-parse_edge_pair(Line, U-V) :- parse_pair_nums(Line, U, V).
+parse_edge_pair_generic(Line, U-V) :-
+    parse_pair_generic(Line, U, V).
+
+parse_node(Str, Node) :-
+    ( number_string(N, Str) ->
+        Node = N
+    ; atom_string(Node, Str)
+    ).
 
 normalize_edges(Edges, directed, Edges).
 normalize_edges(Edges, undirected, Bi) :-
@@ -54,11 +80,16 @@ normalize_edges(Edges, undirected, Bi) :-
     findall(V-U, member(U-V, Edges), E2),
     append(E1, E2, Bi).
 
-build_adjacency(N, Edges, Adj) :-
-    numlist(1, N, Ns),
-    maplist(init_node, Ns, Init),
+collect_all_nodes(Edges, Src, Dst, Nodes) :-
+    findall(X, (member(A-B, Edges), (X=A ; X=B)), Flat),
+    append(Flat, [Src, Dst], All),
+    sort(All, Nodes).
+
+% ---------- adjacency ----------
+build_adjacency(Nodes, Edges, Adj) :-
+    maplist(init_node, Nodes, Init),
     foldl(add_edge, Edges, Init, Adj1),
-    true, Adj = Adj1.
+    Adj = Adj1.
 
 init_node(U, U-[]).
 add_edge(U-V, In, Out) :-
@@ -71,14 +102,15 @@ sort_one(U-Vs0, U-Vs) :- sort(Vs0, Vs).
 
 neighbors(Adj, U, Ns) :- member(U-Ns, Adj).
 
-% DFS: preorder mark (via Visited list), neighbors in numeric order
+% ---------- DFS (forward path accumulation) ----------
 dfs(Adj, Src, Dst, Path) :-
-    dfs_visit(Adj, Src, Dst, [Src], Rev), !,
-    reverse(Rev, Path).
+    dfs_visit(Adj, Src, Dst, [Src], Path).
 
-dfs_visit(_Adj, Dst, Dst, Acc, Acc) :- !.
-dfs_visit(Adj, U, Dst, Vis, Path) :-
+% dfs_visit(+Adj, +Current, +Dst, +PathSoFarForward, -FinalPath)
+dfs_visit(_Adj, Dst, Dst, Path, Path) :- !.
+dfs_visit(Adj, U, Dst, PathSoFar, Path) :-
     neighbors(Adj, U, Ns),
     member(V, Ns),
-    \+ member(V, Vis),
-    dfs_visit(Adj, V, Dst, [V|Vis], Path), !.
+    \+ member(V, PathSoFar),
+    append(PathSoFar, [V], PathNext),          % extend forward
+    dfs_visit(Adj, V, Dst, PathNext, Path), !.

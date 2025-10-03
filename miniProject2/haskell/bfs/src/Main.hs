@@ -5,8 +5,9 @@ import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import Data.Char (toLower)
 import Data.List (isPrefixOf)
+import qualified Data.Map.Strict as M
 
-import Graph.Format (NMInput(..), readNMInput)
+import Graph.Format (LabeledInput(..), readLabeledInput)
 import qualified Graph.DirectedBFS   as Dir
 import qualified Graph.UndirectedBFS as Undir
 import Graph.BFS (bfsPath)
@@ -19,11 +20,15 @@ errInvalidArgs = "Error: invalid arguments."
 usage :: IO ()
 usage = do
   putStrLn "Usage:"
-  putStrLn "  stack run -- --mode directed   <path/to/input.in>"
-  putStrLn "  stack run -- --mode undirected <path/to/input.in>"
+  putStrLn "  stack run -- --mode directed   <path/to/DG.in>"
+  putStrLn "  stack run -- --mode undirected <path/to/UDG.in>"
   putStrLn ""
-  putStrLn "Input format: N M, then SRC DST, then M lines of edges U V (integers)."
-  putStrLn "Output: space-separated path from SRC to DST, or 'No path'."
+  putStrLn "Input format:"
+  putStrLn "  N M"
+  putStrLn "  SRC DST"
+  putStrLn "  M lines: U V"
+  putStrLn "Nodes are arbitrary labels (no spaces)."
+  putStrLn "Output: space-separated path labels, or 'No path'."
 
 parseMode :: String -> Maybe Mode
 parseMode s =
@@ -32,10 +37,6 @@ parseMode s =
     "undirected" -> Just Undirected
     _            -> Nothing
 
--- Accepts:
---   --mode <val> <file>
---   -m <val> <file>
---   --mode=<val> <file>
 parseArgs :: [String] -> Either String (Mode, FilePath)
 parseArgs ["--mode", modeStr, fp]   = maybe (Left errInvalidArgs) (\mm -> Right (mm, fp)) (parseMode modeStr)
 parseArgs ["-m", modeStr, fp]       = maybe (Left errInvalidArgs) (\mm -> Right (mm, fp)) (parseMode modeStr)
@@ -57,23 +58,46 @@ main = do
 
 run :: Mode -> FilePath -> IO ()
 run mode fp = do
-  NMInput _ _ s d es <- readNMInput fp
-  case mode of
-    Directed   -> runDirected s d es
-    Undirected -> runUndirected s d es
+  LabeledInput nDecl mDecl sLbl dLbl ledges <- readLabeledInput fp
+  let allLabels = uniqPreserve (sLbl:dLbl:concatMap (\(a,b)->[a,b]) ledges)
+      labelCount = length allLabels
+  if labelCount /= nDecl
+    then do
+      putStrLn ("Error: declared N=" ++ show nDecl ++ " but counted " ++ show labelCount ++ " labels.")
+      exitFailure
+    else do
+      let labelToInt = M.fromList (zip allLabels [0..])
+          intToLabel = M.fromList (zip [0..] allLabels)
+          enc (a,b) =
+            case (M.lookup a labelToInt, M.lookup b labelToInt) of
+              (Just ai, Just bi) -> (ai, bi)
+              _ -> error "Internal mapping failure."
+          edgesInt = map enc ledges
+          srcInt   = labelToInt M.! sLbl
+          dstInt   = labelToInt M.! dLbl
+          runDir = do
+            let adj = Dir.buildAdjacency edgesInt
+                succF = Dir.succOf adj
+            outputPath intToLabel (bfsPath succF srcInt dstInt)
+          runUndir = do
+            let adj = Undir.buildAdjacency edgesInt
+                succF = Undir.succOf adj
+            outputPath intToLabel (bfsPath succF srcInt dstInt)
+      case mode of
+        Directed   -> runDir
+        Undirected -> runUndir
+  where
+    outputPath :: M.Map Int String -> Maybe [Int] -> IO ()
+    outputPath intToLabel mp =
+      case mp of
+        Nothing  -> putStrLn "No path"
+        Just is  -> putStrLn (unwords (map (\i -> intToLabel M.! i) is))
 
-runDirected :: Int -> Int -> [(Int,Int)] -> IO ()
-runDirected s d es =
-  let adj   = Dir.buildAdjacency es
-      succF = Dir.succOf adj
-  in case bfsPath succF s d of
-       Nothing  -> putStrLn "No path"
-       Just pth -> putStrLn (unwords (map show pth))
-
-runUndirected :: Int -> Int -> [(Int,Int)] -> IO ()
-runUndirected s d es =
-  let adj   = Undir.buildAdjacency es
-      succF = Undir.succOf adj
-  in case bfsPath succF s d of
-       Nothing  -> putStrLn "No path"
-       Just pth -> putStrLn (unwords (map show pth))
+    uniqPreserve :: (Ord a) => [a] -> [a]
+    uniqPreserve = go M.empty []
+      where
+        go _ acc [] = reverse acc
+        go seen acc (x:xs) =
+          if M.member x seen
+             then go seen acc xs
+             else go (M.insert x () seen) (x:acc) xs

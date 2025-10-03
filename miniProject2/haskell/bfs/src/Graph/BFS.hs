@@ -1,8 +1,4 @@
 {-# OPTIONS_GHC -Wall #-}
--- Queue-based BFS path search:
--- - Mark visited when enqueuing neighbors.
--- - Stop when the target node is dequeued.
--- - Reconstruct path via a parent map.
 module Graph.BFS
   ( bfsPath
   ) where
@@ -12,8 +8,6 @@ import qualified Data.IntSet as IS
 import qualified Data.Sequence as Seq
 import Data.Sequence (Seq, ViewL(..), (|>))
 
--- Returns the shortest path (by edges) from s to t under the given neighbor order,
--- or Nothing if no path exists.
 bfsPath :: (Int -> [Int]) -> Int -> Int -> Maybe [Int]
 bfsPath succF s t
   | s == t    = Just [s]
